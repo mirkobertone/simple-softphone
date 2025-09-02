@@ -53,7 +53,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     sipService.on("registrationStatusChanged", handleStatusChange);
 
     return () => {
-      sipService.off("registrationStatusChanged");
+      sipService.off("registrationStatusChanged", handleStatusChange);
     };
   }, [sipService, loadAccounts]);
 

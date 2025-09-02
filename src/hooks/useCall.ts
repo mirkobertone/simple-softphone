@@ -66,8 +66,8 @@ export function useCall() {
     sipService.on("callEnded", handleCallEnded);
 
     return () => {
-      sipService.off("incomingCall");
-      sipService.off("callEnded");
+      sipService.off("incomingCall", handleIncomingCall);
+      sipService.off("callEnded", handleCallEnded);
     };
   }, [sipService]);
 

@@ -21,7 +21,9 @@ export class SIPService {
   private static instance: SIPService;
   private userAgent: JsSIP.UA | null = null;
   private currentAccount: SIPAccount | null = null;
-  private eventListeners: Partial<SIPServiceEvents> = {};
+  private eventListeners: {
+    [K in keyof SIPServiceEvents]?: SIPServiceEvents[K][];
+  } = {};
   private storageService: StorageService;
   private isRegistering = false;
 
@@ -41,21 +43,52 @@ export class SIPService {
     event: K,
     listener: SIPServiceEvents[K]
   ): void {
-    this.eventListeners[event] = listener;
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event]!.push(listener);
+    console.log(
+      `[SIPService] Added listener for ${event}, total: ${
+        this.eventListeners[event]!.length
+      }`
+    );
   }
 
-  public off<K extends keyof SIPServiceEvents>(event: K): void {
-    delete this.eventListeners[event];
+  public off<K extends keyof SIPServiceEvents>(
+    event: K,
+    listener?: SIPServiceEvents[K]
+  ): void {
+    if (!this.eventListeners[event]) return;
+
+    if (listener) {
+      // Remove specific listener
+      const index = this.eventListeners[event]!.indexOf(listener);
+      if (index > -1) {
+        this.eventListeners[event]!.splice(index, 1);
+      }
+    } else {
+      // Remove all listeners for this event
+      delete this.eventListeners[event];
+    }
+    console.log(`[SIPService] Removed listener(s) for ${event}`);
   }
 
   private emit<K extends keyof SIPServiceEvents>(
     event: K,
     ...args: Parameters<SIPServiceEvents[K]>
   ): void {
-    const listener = this.eventListeners[event];
-    if (listener) {
-      // @ts-ignore - TypeScript doesn't handle this pattern well
-      listener(...args);
+    console.log(`[SIPService] Emitting event: ${event}`, args);
+    const listeners = this.eventListeners[event];
+    if (listeners && listeners.length > 0) {
+      console.log(
+        `[SIPService] Found ${listeners.length} listener(s) for ${event}, calling them`
+      );
+      listeners.forEach((listener) => {
+        // @ts-ignore - TypeScript doesn't handle this pattern well
+        listener(...args);
+      });
+    } else {
+      console.warn(`[SIPService] No listeners found for event: ${event}`);
     }
   }
 

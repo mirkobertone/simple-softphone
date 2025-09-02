@@ -61,14 +61,14 @@ export function Dialpad({
   };
 
   return (
-    <Card className="w-full max-w-sm mx-auto">
+    <Card className="w-full max-w-sm mx-auto shadow-lg">
       <CardHeader className="pb-4">
         <div className="space-y-2">
           <Input
             value={phoneNumber}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="Enter phone number"
-            className="text-center text-lg font-mono"
+            className="text-center text-lg font-mono h-12 border-2"
             disabled={disabled}
           />
         </div>
@@ -82,7 +82,7 @@ export function Dialpad({
               key={number}
               variant="outline"
               size="lg"
-              className="h-16 flex flex-col items-center justify-center hover:bg-muted/50 active:scale-95 transition-all"
+              className="h-16 flex flex-col items-center justify-center hover:bg-muted/50 active:scale-95 transition-all border-2 hover:border-primary/20"
               onClick={() => handleNumberClick(number)}
               disabled={disabled}
             >
@@ -97,12 +97,12 @@ export function Dialpad({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 mt-6">
+        <div className="flex gap-3 mt-6">
           {/* Backspace Button */}
           <Button
             variant="outline"
             size="lg"
-            className="flex-1 h-12"
+            className="flex-1 h-14 border-2"
             onClick={handleBackspace}
             disabled={disabled || phoneNumber.length === 0}
           >
@@ -114,7 +114,7 @@ export function Dialpad({
             <Button
               variant="destructive"
               size="lg"
-              className="flex-1 h-12"
+              className="flex-[2] h-14 text-base font-semibold"
               onClick={handleHangup}
               disabled={disabled}
             >
@@ -125,7 +125,7 @@ export function Dialpad({
             <Button
               variant="default"
               size="lg"
-              className="flex-1 h-12 bg-green-600 hover:bg-green-700"
+              className="flex-[2] h-14 bg-green-600 hover:bg-green-700 text-base font-semibold"
               onClick={handleCall}
               disabled={disabled || phoneNumber.length === 0}
             >
