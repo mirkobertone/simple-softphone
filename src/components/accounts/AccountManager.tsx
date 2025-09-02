@@ -114,13 +114,10 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     }
   };
 
-  const handleSetActiveAccount = async (account: SIPAccount) => {
+  const handleSetActiveAccount = (account: SIPAccount) => {
     storageService.setActiveAccountId(account.id);
     setActiveAccountId(account.id);
     onAccountSelect?.(account);
-
-    // Attempt to register the selected account
-    await sipService.registerAccount(account);
   };
 
   const handleRegisterAccount = async (account: SIPAccount) => {

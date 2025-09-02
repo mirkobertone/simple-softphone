@@ -51,10 +51,9 @@ function App() {
     };
   }, [sipService]);
 
-  const handleAccountSelect = async (account: SIPAccount) => {
+  const handleAccountSelect = (account: SIPAccount) => {
     setActiveAccount(account);
-    // Initialize SIP connection with selected account
-    await sipService.registerAccount(account);
+    // Account selection only sets the active account, registration is handled by explicit button clicks
   };
 
   const handleAccountChange = (accountId: string) => {

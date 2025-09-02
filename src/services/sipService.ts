@@ -66,11 +66,19 @@ export class SIPService {
       return false;
     }
 
+    // If already registered with the same account, don't re-register
+    if (this.currentAccount?.id === account.id && this.isRegistered()) {
+      console.log("Account already registered, skipping re-registration");
+      return true;
+    }
+
     try {
       this.isRegistering = true;
 
-      // Disconnect existing connection
-      await this.disconnect();
+      // Disconnect existing connection only if it's a different account
+      if (this.currentAccount && this.currentAccount.id !== account.id) {
+        await this.disconnect();
+      }
 
       // Update status to connecting
       this.updateAccountStatus(account.id, "connecting");
@@ -93,7 +101,7 @@ export class SIPService {
         no_answer_timeout: 60,
         use_preloaded_route: false,
         register_expires: 300,
-        registrar_server: null,
+        registrar_server: undefined,
       };
 
       this.userAgent = new JsSIP.UA(configuration);
