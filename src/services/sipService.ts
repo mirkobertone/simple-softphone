@@ -124,20 +124,19 @@ export class SIPService {
       const configuration = {
         sockets: [new JsSIP.WebSocketInterface(wsUrl)],
         uri: sipUri,
-        password: account.password,
         authorization_user: account.userId,
-        display_name: account.displayName || account.name,
+        password: account.password,
         register: true,
-        session_timers: false,
-        connection_recovery_min_interval: 2,
-        connection_recovery_max_interval: 30,
-        no_answer_timeout: 60,
-        use_preloaded_route: false,
         register_expires: 300,
-        registrar_server: undefined,
+        session_timers_refresh_method: "invite",
+        user_agent: "SimpleSoftphone",
+        // ha1: "test123",
+        // realm: "asterisk",
       };
 
       this.userAgent = new JsSIP.UA(configuration);
+      console.log("configuration", configuration);
+
       this.currentAccount = account;
 
       // Set up event handlers
@@ -297,6 +296,16 @@ export class SIPService {
       console.log(`Making call to: ${target}`);
       const session = this.userAgent.call(target, {
         mediaConstraints: { audio: true, video: false },
+        pcConfig: {
+          iceServers: [
+            {
+              urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302",
+              ],
+            },
+          ],
+        },
         ...options,
       });
 
