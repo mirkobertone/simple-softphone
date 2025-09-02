@@ -31,6 +31,7 @@ const sipAccountSchema = z.object({
   password: z.string().min(1, "Password is required"),
   port: z.number().min(1).max(65535, "Port must be between 1 and 65535"),
   transport: z.enum(["UDP", "TCP", "TLS", "WS", "WSS"]),
+  websocketPath: z.string().optional(),
   displayName: z.string().optional(),
 });
 
@@ -56,6 +57,7 @@ export function AccountForm({
       password: initialData?.password || "",
       port: initialData?.port || DEFAULT_PORTS.WSS,
       transport: initialData?.transport || "WSS",
+      websocketPath: initialData?.websocketPath || "/ws",
       displayName: initialData?.displayName || "",
     },
   });
@@ -210,6 +212,23 @@ export function AccountForm({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="websocketPath"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>WebSocket Path</FormLabel>
+                  <FormControl>
+                    <Input placeholder="/ws" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    WebSocket path on the server (e.g., /ws for Asterisk)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

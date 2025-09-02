@@ -6,6 +6,7 @@ export interface SIPAccount {
   password: string;
   port: number; // SIP server port (usually 5060 for UDP/TCP, 5061 for TLS)
   transport: "UDP" | "TCP" | "TLS" | "WS" | "WSS";
+  websocketPath?: string; // WebSocket path (default: /ws for Asterisk)
   displayName?: string;
   isActive: boolean;
   registrationStatus: "registered" | "unregistered" | "connecting" | "failed";
@@ -20,6 +21,7 @@ export interface SIPAccountFormData {
   password: string;
   port: number;
   transport: "UDP" | "TCP" | "TLS" | "WS" | "WSS";
+  websocketPath?: string;
   displayName?: string;
 }
 
@@ -40,6 +42,6 @@ export const DEFAULT_PORTS: Record<string, number> = {
   UDP: 5060,
   TCP: 5060,
   TLS: 5061,
-  WS: 80,
-  WSS: 443,
+  WS: 8088,
+  WSS: 8088,
 };

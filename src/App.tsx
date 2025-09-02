@@ -3,12 +3,14 @@ import { AccountManager } from "@/components/accounts/AccountManager";
 import { AccountSelector } from "@/components/accounts/AccountSelector";
 import type { SIPAccount } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
+import { SIPService } from "@/services/sipService";
 
 function App() {
   const [accounts, setAccounts] = useState<SIPAccount[]>([]);
   const [activeAccount, setActiveAccount] = useState<SIPAccount | null>(null);
 
   const storageService = StorageService.getInstance();
+  const sipService = SIPService.getInstance();
 
   useEffect(() => {
     // Load accounts on app start
@@ -21,11 +23,38 @@ function App() {
       const active = savedAccounts.find((acc) => acc.id === activeAccountId);
       setActiveAccount(active || null);
     }
-  }, [storageService]);
 
-  const handleAccountSelect = (account: SIPAccount) => {
+    // Listen for registration status changes
+    const handleStatusChange = () => {
+      const updatedAccounts = storageService.getSIPAccounts();
+      setAccounts(updatedAccounts);
+
+      if (activeAccountId) {
+        const updatedActive = updatedAccounts.find(
+          (acc) => acc.id === activeAccountId
+        );
+        setActiveAccount(updatedActive || null);
+      }
+    };
+
+    sipService.on("registrationStatusChanged", handleStatusChange);
+
+    return () => {
+      sipService.off("registrationStatusChanged");
+    };
+  }, [storageService, sipService]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      sipService.destroy();
+    };
+  }, [sipService]);
+
+  const handleAccountSelect = async (account: SIPAccount) => {
     setActiveAccount(account);
-    // TODO: Initialize SIP connection with selected account
+    // Initialize SIP connection with selected account
+    await sipService.registerAccount(account);
   };
 
   const handleAccountChange = (accountId: string) => {
@@ -69,14 +98,47 @@ function App() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-xl font-semibold mb-2">Call Interface</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Ready to make calls
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        activeAccount.registrationStatus === "registered"
+                          ? "bg-green-500"
+                          : activeAccount.registrationStatus === "connecting"
+                          ? "bg-yellow-500 animate-pulse"
+                          : "bg-red-500"
+                      }`}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      {activeAccount.registrationStatus === "registered"
+                        ? "Ready to make calls"
+                        : activeAccount.registrationStatus === "connecting"
+                        ? "Connecting to SIP server..."
+                        : "Not connected - check account settings"}
+                    </p>
+                  </div>
                 </div>
-                {/* TODO: Add dialpad and call controls here */}
-                <div className="bg-muted/30 rounded-lg p-8 text-center text-muted-foreground">
-                  <p>Dialpad and call controls will appear here</p>
-                </div>
+
+                {activeAccount.registrationStatus === "registered" ? (
+                  <div className="bg-muted/30 rounded-lg p-8 text-center text-muted-foreground">
+                    <p>Dialpad and call controls will appear here</p>
+                  </div>
+                ) : (
+                  <div className="bg-muted/30 rounded-lg p-8 text-center">
+                    <div className="text-muted-foreground">
+                      <p className="mb-2">
+                        {activeAccount.registrationStatus === "connecting"
+                          ? "Establishing connection..."
+                          : "Connection required"}
+                      </p>
+                      {activeAccount.registrationStatus === "failed" && (
+                        <p className="text-sm text-destructive">
+                          Registration failed. Please check your account
+                          settings.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg">

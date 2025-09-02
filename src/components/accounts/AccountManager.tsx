@@ -8,6 +8,7 @@ import { AccountForm } from "./AccountForm";
 import type { SIPAccount, SIPAccountFormData } from "@/types/sip";
 import { DEFAULT_PORTS } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
+import { SIPService } from "@/services/sipService";
 
 interface AccountManagerProps {
   onAccountSelect?: (account: SIPAccount) => void;
@@ -21,6 +22,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const storageService = StorageService.getInstance();
+  const sipService = SIPService.getInstance();
 
   const loadAccounts = useCallback(() => {
     const savedAccounts = storageService.getSIPAccounts();
@@ -28,6 +30,19 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     setAccounts(savedAccounts);
     setActiveAccountId(activeId);
   }, [storageService]);
+
+  // Listen for registration status changes
+  useEffect(() => {
+    const handleStatusChange = () => {
+      loadAccounts();
+    };
+
+    sipService.on("registrationStatusChanged", handleStatusChange);
+
+    return () => {
+      sipService.off("registrationStatusChanged");
+    };
+  }, [sipService, loadAccounts]);
 
   // Load accounts on component mount
   useEffect(() => {
@@ -99,10 +114,23 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     }
   };
 
-  const handleSetActiveAccount = (account: SIPAccount) => {
+  const handleSetActiveAccount = async (account: SIPAccount) => {
     storageService.setActiveAccountId(account.id);
     setActiveAccountId(account.id);
     onAccountSelect?.(account);
+
+    // Attempt to register the selected account
+    await sipService.registerAccount(account);
+  };
+
+  const handleRegisterAccount = async (account: SIPAccount) => {
+    await sipService.registerAccount(account);
+  };
+
+  const handleUnregisterAccount = async (account: SIPAccount) => {
+    if (sipService.getCurrentAccount()?.id === account.id) {
+      await sipService.unregister();
+    }
   };
 
   const getStatusBadgeVariant = (status: SIPAccount["registrationStatus"]) => {
@@ -210,6 +238,48 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                           </Badge>
                         )}
                       </div>
+
+                      {account.id === activeAccountId && (
+                        <div className="flex gap-1 mt-2">
+                          {account.registrationStatus === "registered" ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUnregisterAccount(account);
+                              }}
+                              className="text-xs h-7"
+                            >
+                              <PowerOff className="w-3 h-3 mr-1" />
+                              Unregister
+                            </Button>
+                          ) : account.registrationStatus === "connecting" ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled
+                              className="text-xs h-7"
+                            >
+                              <Power className="w-3 h-3 mr-1 animate-pulse" />
+                              Connecting...
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRegisterAccount(account);
+                              }}
+                              className="text-xs h-7"
+                            >
+                              <Power className="w-3 h-3 mr-1" />
+                              Register
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 
