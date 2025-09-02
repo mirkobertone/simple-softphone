@@ -149,16 +149,43 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     console.log(
       `Attempting to unregister account: ${account.name} (${account.id})`
     );
-    if (sipService.getCurrentAccount()?.id === account.id) {
+
+    const currentAccount = sipService.getCurrentAccount();
+    console.log(
+      "Current SIP account:",
+      currentAccount?.id,
+      currentAccount?.name
+    );
+    console.log("Account to unregister:", account.id, account.name);
+    console.log("Are they the same?", currentAccount?.id === account.id);
+
+    // Check if this account is registered
+    if (account.registrationStatus === "registered") {
       try {
-        await sipService.unregister();
+        // If SIP service has no current account (e.g., after page reload),
+        // just update the status directly
+        if (!currentAccount) {
+          console.log("No current SIP account, updating status directly");
+          storageService.updateSIPAccount(account.id, {
+            registrationStatus: "unregistered",
+          });
+          loadAccounts();
+        } else {
+          // Normal unregister through SIP service
+          await sipService.unregister();
+        }
         console.log(`Unregistered account: ${account.name}`);
       } catch (error) {
         console.error(`Failed to unregister account ${account.name}:`, error);
+        // Fallback: update status directly if SIP unregister fails
+        storageService.updateSIPAccount(account.id, {
+          registrationStatus: "unregistered",
+        });
+        loadAccounts();
       }
     } else {
       console.warn(
-        `Cannot unregister ${account.name}: not the current account`
+        `Cannot unregister ${account.name}: account is not registered`
       );
     }
   };

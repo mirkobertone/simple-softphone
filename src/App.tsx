@@ -27,10 +27,23 @@ function App() {
     const savedAccounts = storageService.getSIPAccounts();
     const activeAccountId = storageService.getActiveAccountId();
 
-    setAccounts(savedAccounts);
+    // Reset all accounts to unregistered on page load since SIP connections are lost
+    const resetAccounts = savedAccounts.map((account) => ({
+      ...account,
+      registrationStatus: "unregistered" as const,
+    }));
+
+    // Update storage with reset status
+    resetAccounts.forEach((account) => {
+      storageService.updateSIPAccount(account.id, {
+        registrationStatus: "unregistered",
+      });
+    });
+
+    setAccounts(resetAccounts);
 
     if (activeAccountId) {
-      const active = savedAccounts.find((acc) => acc.id === activeAccountId);
+      const active = resetAccounts.find((acc) => acc.id === activeAccountId);
       setActiveAccount(active || null);
     }
 
