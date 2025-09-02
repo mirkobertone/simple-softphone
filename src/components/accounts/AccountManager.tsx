@@ -2,7 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { Plus, Settings, Trash2, Power, PowerOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { AccountForm } from "./AccountForm";
 import type { SIPAccount, SIPAccountFormData } from "@/types/sip";
@@ -19,6 +24,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
   const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<SIPAccount | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const storageService = StorageService.getInstance();
@@ -100,6 +106,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
       if (updatedAccount) {
         loadAccounts();
         setEditingAccount(null);
+        setIsEditDialogOpen(false); // Close the dialog
 
         // If this was the active account, notify parent
         if (updatedAccount.id === activeAccountId) {
@@ -226,6 +233,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
+            <DialogTitle>Add SIP Account</DialogTitle>
             <AccountForm
               onSubmit={handleAddAccount}
               onCancel={() => setIsAddDialogOpen(false)}
@@ -341,7 +349,10 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                   </div>
 
                   <div className="flex items-center gap-1 ml-2">
-                    <Dialog>
+                    <Dialog
+                      open={isEditDialogOpen}
+                      onOpenChange={setIsEditDialogOpen}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="ghost"
@@ -349,16 +360,23 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingAccount(account);
+                            setIsEditDialogOpen(true);
                           }}
                         >
                           <Settings className="w-4 h-4" />
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-md">
+                        <DialogTitle>
+                          {editingAccount ? "Edit SIP Account" : "SIP Account"}
+                        </DialogTitle>
                         {editingAccount && (
                           <AccountForm
                             onSubmit={handleEditAccount}
-                            onCancel={() => setEditingAccount(null)}
+                            onCancel={() => {
+                              setEditingAccount(null);
+                              setIsEditDialogOpen(false);
+                            }}
                             initialData={editingAccount}
                             isLoading={isLoading}
                           />
