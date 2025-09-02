@@ -171,7 +171,13 @@ export class SIPService {
     // Registration events
     this.userAgent.on("registered", () => {
       console.log("SIP account registered successfully");
-      this.updateAccountStatus(accountId, "registered");
+      console.log("UserAgent isRegistered():", this.userAgent?.isRegistered());
+      console.log("UserAgent isConnected():", this.userAgent?.isConnected());
+
+      // Small delay to ensure UserAgent is fully ready
+      setTimeout(() => {
+        this.updateAccountStatus(accountId, "registered");
+      }, 100);
     });
 
     this.userAgent.on("unregistered", () => {
@@ -228,24 +234,40 @@ export class SIPService {
     this.emit("registrationStatusChanged", accountId, status);
   }
 
-  // Call management (for future implementation)
+  // Call management
   public makeCall(target: string, options?: any): any | null {
     if (!this.userAgent || !this.currentAccount) {
       console.error("No active SIP account");
       return null;
     }
 
-    if (this.currentAccount.registrationStatus !== "registered") {
-      console.error("SIP account not registered");
+    // Debug registration status
+    console.log("UserAgent isRegistered():", this.userAgent.isRegistered());
+    console.log("UserAgent isConnected():", this.userAgent.isConnected());
+    console.log(
+      "Current account status:",
+      this.currentAccount.registrationStatus
+    );
+
+    // Check both connection and registration status
+    if (!this.userAgent.isConnected()) {
+      console.error("SIP account not connected to server");
+      return null;
+    }
+
+    if (!this.userAgent.isRegistered()) {
+      console.error("SIP account not registered with server");
       return null;
     }
 
     try {
+      console.log(`Making call to: ${target}`);
       const session = this.userAgent.call(target, {
         mediaConstraints: { audio: true, video: false },
         ...options,
       });
 
+      console.log("Call session created:", session);
       return session;
     } catch (error) {
       console.error("Failed to make call:", error);

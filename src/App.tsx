@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { AccountManager } from "@/components/accounts/AccountManager";
 import { AccountSelector } from "@/components/accounts/AccountSelector";
+import { Dialpad } from "@/components/dialpad/Dialpad";
 import type { SIPAccount } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
 import { SIPService } from "@/services/sipService";
+import { useCall } from "@/hooks/useCall";
 
 function App() {
   const [accounts, setAccounts] = useState<SIPAccount[]>([]);
@@ -11,6 +13,14 @@ function App() {
 
   const storageService = StorageService.getInstance();
   const sipService = SIPService.getInstance();
+  const {
+    callState,
+    makeCall,
+    hangupCall,
+    formatDuration,
+    isInCall,
+    isCallActive,
+  } = useCall();
 
   useEffect(() => {
     // Load accounts on app start
@@ -109,7 +119,13 @@ function App() {
                     />
                     <p className="text-sm text-muted-foreground">
                       {activeAccount.registrationStatus === "registered"
-                        ? "Ready to make calls"
+                        ? isCallActive
+                          ? `Call ${callState.status}${
+                              isInCall
+                                ? ` - ${formatDuration(callState.duration)}`
+                                : ""
+                            }`
+                          : "Ready to make calls"
                         : activeAccount.registrationStatus === "connecting"
                         ? "Connecting to SIP server..."
                         : "Not connected - check account settings"}
@@ -118,8 +134,38 @@ function App() {
                 </div>
 
                 {activeAccount.registrationStatus === "registered" ? (
-                  <div className="bg-muted/30 rounded-lg p-8 text-center text-muted-foreground">
-                    <p>Dialpad and call controls will appear here</p>
+                  <div className="space-y-4">
+                    {/* Call Status Display */}
+                    {isCallActive && (
+                      <div className="bg-muted/30 rounded-lg p-4 text-center">
+                        <div className="text-sm font-medium mb-1">
+                          {callState.status === "calling" && "Calling..."}
+                          {callState.status === "ringing" && "Ringing..."}
+                          {callState.status === "connected" && "Connected"}
+                          {callState.status === "ended" && "Call Ended"}
+                        </div>
+                        {callState.remoteNumber && (
+                          <div className="text-lg font-mono">
+                            {callState.remoteNumber}
+                          </div>
+                        )}
+                        {isInCall && (
+                          <div className="text-sm text-muted-foreground mt-1">
+                            Duration: {formatDuration(callState.duration)}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Dialpad */}
+                    <Dialpad
+                      onCall={makeCall}
+                      onHangup={hangupCall}
+                      disabled={
+                        activeAccount.registrationStatus !== "registered"
+                      }
+                      isInCall={isInCall}
+                    />
                   </div>
                 ) : (
                   <div className="bg-muted/30 rounded-lg p-8 text-center">
