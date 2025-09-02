@@ -8,7 +8,7 @@ import { AccountForm } from "./AccountForm";
 import type { SIPAccount, SIPAccountFormData } from "@/types/sip";
 import { DEFAULT_PORTS } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
-import { SIPService } from "@/services/sipService";
+import { SIPService, type SIPRegistrationStatus } from "@/services/sipService";
 
 interface AccountManagerProps {
   onAccountSelect?: (account: SIPAccount) => void;
@@ -33,7 +33,20 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
 
   // Listen for registration status changes
   useEffect(() => {
-    const handleStatusChange = () => {
+    const handleStatusChange = (
+      accountId: string,
+      status: SIPRegistrationStatus
+    ) => {
+      console.log(`Registration status changed for ${accountId}: ${status}`);
+
+      // Update the specific account in the local state immediately
+      setAccounts((prevAccounts) =>
+        prevAccounts.map((acc) =>
+          acc.id === accountId ? { ...acc, registrationStatus: status } : acc
+        )
+      );
+
+      // Also reload from storage to ensure consistency
       loadAccounts();
     };
 
@@ -121,12 +134,32 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
   };
 
   const handleRegisterAccount = async (account: SIPAccount) => {
-    await sipService.registerAccount(account);
+    console.log(
+      `Attempting to register account: ${account.name} (${account.id})`
+    );
+    try {
+      const success = await sipService.registerAccount(account);
+      console.log(`Registration result for ${account.name}: ${success}`);
+    } catch (error) {
+      console.error(`Failed to register account ${account.name}:`, error);
+    }
   };
 
   const handleUnregisterAccount = async (account: SIPAccount) => {
+    console.log(
+      `Attempting to unregister account: ${account.name} (${account.id})`
+    );
     if (sipService.getCurrentAccount()?.id === account.id) {
-      await sipService.unregister();
+      try {
+        await sipService.unregister();
+        console.log(`Unregistered account: ${account.name}`);
+      } catch (error) {
+        console.error(`Failed to unregister account ${account.name}:`, error);
+      }
+    } else {
+      console.warn(
+        `Cannot unregister ${account.name}: not the current account`
+      );
     }
   };
 
