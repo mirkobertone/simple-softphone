@@ -1,23 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Settings, Trash2, Power, PowerOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { AccountForm } from "./AccountForm";
 import type { SIPAccount, SIPAccountFormData } from "@/types/sip";
+import { DEFAULT_PORTS } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
 
 interface AccountManagerProps {
@@ -33,17 +22,17 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
 
   const storageService = StorageService.getInstance();
 
-  // Load accounts on component mount
-  useEffect(() => {
-    loadAccounts();
-  }, []);
-
-  const loadAccounts = () => {
+  const loadAccounts = useCallback(() => {
     const savedAccounts = storageService.getSIPAccounts();
     const activeId = storageService.getActiveAccountId();
     setAccounts(savedAccounts);
     setActiveAccountId(activeId);
-  };
+  }, [storageService]);
+
+  // Load accounts on component mount
+  useEffect(() => {
+    loadAccounts();
+  }, [loadAccounts]);
 
   const handleAddAccount = async (formData: SIPAccountFormData) => {
     setIsLoading(true);
@@ -105,7 +94,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
       // If the deleted account was active, clear selection
       if (accountId === activeAccountId) {
         setActiveAccountId(null);
-        onAccountSelect?.(null as any);
+        onAccountSelect?.(null as unknown as SIPAccount);
       }
     }
   };
@@ -152,9 +141,6 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add SIP Account</DialogTitle>
-            </DialogHeader>
             <AccountForm
               onSubmit={handleAddAccount}
               onCancel={() => setIsAddDialogOpen(false)}
@@ -188,38 +174,46 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
               onClick={() => handleSetActiveAccount(account)}
             >
               <CardContent className="pt-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-medium">{account.name}</h3>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-medium truncate">{account.name}</h3>
                       {account.id === activeAccountId && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs shrink-0">
                           Active
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {account.userId}@{account.server}:{account.port}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge
-                        variant={getStatusBadgeVariant(
-                          account.registrationStatus
+
+                    <div className="space-y-1">
+                      <p className="text-sm text-muted-foreground truncate">
+                        {account.userId}@{account.server}
+                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge
+                          variant={getStatusBadgeVariant(
+                            account.registrationStatus
+                          )}
+                          className="text-xs"
+                        >
+                          {getStatusIcon(account.registrationStatus)}
+                          <span className="ml-1 capitalize">
+                            {account.registrationStatus}
+                          </span>
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {account.transport}
+                        </Badge>
+                        {account.port !== DEFAULT_PORTS[account.transport] && (
+                          <Badge variant="outline" className="text-xs">
+                            Port {account.port}
+                          </Badge>
                         )}
-                        className="text-xs"
-                      >
-                        {getStatusIcon(account.registrationStatus)}
-                        <span className="ml-1 capitalize">
-                          {account.registrationStatus}
-                        </span>
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {account.transport}
-                      </Badge>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 ml-2">
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
@@ -234,9 +228,6 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Edit SIP Account</DialogTitle>
-                        </DialogHeader>
                         {editingAccount && (
                           <AccountForm
                             onSubmit={handleEditAccount}

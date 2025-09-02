@@ -38,42 +38,57 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold mb-4">Simple Softphone</h1>
-
-          {accounts.length > 0 && (
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">Active Account:</span>
-              <AccountSelector
-                accounts={accounts}
-                activeAccountId={activeAccount?.id || null}
-                onAccountChange={handleAccountChange}
-              />
-            </div>
-          )}
-        </header>
-
-        <main className="grid gap-6 md:grid-cols-2">
-          <div>
-            <AccountManager onAccountSelect={handleAccountSelect} />
-          </div>
-
-          <div>
-            {activeAccount ? (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Call Interface</h3>
-                <p className="text-muted-foreground">
-                  Ready to make calls with:{" "}
-                  <strong>{activeAccount.name}</strong>
-                </p>
-                {/* TODO: Add dialpad and call controls here */}
-              </div>
-            ) : (
-              <div className="text-center text-muted-foreground">
-                <p>Select or add a SIP account to start making calls</p>
+        <header className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold">Simple Softphone</h1>
+            {accounts.length > 0 && activeAccount && (
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <div className="text-sm font-medium">Active Account</div>
+                  <div className="text-xs text-muted-foreground">
+                    {activeAccount.name}
+                  </div>
+                </div>
+                <AccountSelector
+                  accounts={accounts}
+                  activeAccountId={activeAccount?.id || null}
+                  onAccountChange={handleAccountChange}
+                />
               </div>
             )}
           </div>
+        </header>
+
+        <main className="grid gap-8 md:grid-cols-2">
+          <section>
+            <AccountManager onAccountSelect={handleAccountSelect} />
+          </section>
+
+          <section>
+            {activeAccount ? (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">Call Interface</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Ready to make calls
+                  </p>
+                </div>
+                {/* TODO: Add dialpad and call controls here */}
+                <div className="bg-muted/30 rounded-lg p-8 text-center text-muted-foreground">
+                  <p>Dialpad and call controls will appear here</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg">
+                <div className="text-center text-muted-foreground">
+                  <p className="text-lg mb-2">No Account Selected</p>
+                  <p className="text-sm">
+                    Select or add a SIP account to start making calls
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
         </main>
       </div>
     </div>

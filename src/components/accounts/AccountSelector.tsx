@@ -27,8 +27,6 @@ export function AccountSelector({
     );
   }
 
-  const activeAccount = accounts.find((acc) => acc.id === activeAccountId);
-
   return (
     <div className="flex items-center gap-2">
       <Select value={activeAccountId || ""} onValueChange={onAccountChange}>
@@ -38,15 +36,19 @@ export function AccountSelector({
         <SelectContent>
           {accounts.map((account) => (
             <SelectItem key={account.id} value={account.id}>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between w-full">
                 <span>{account.name}</span>
                 <Badge
                   variant={
                     account.registrationStatus === "registered"
                       ? "default"
-                      : "secondary"
+                      : account.registrationStatus === "connecting"
+                      ? "secondary"
+                      : account.registrationStatus === "failed"
+                      ? "destructive"
+                      : "outline"
                   }
-                  className="text-xs"
+                  className="text-xs ml-2"
                 >
                   {account.registrationStatus}
                 </Badge>
@@ -55,18 +57,6 @@ export function AccountSelector({
           ))}
         </SelectContent>
       </Select>
-
-      {activeAccount && (
-        <Badge
-          variant={
-            activeAccount.registrationStatus === "registered"
-              ? "default"
-              : "secondary"
-          }
-        >
-          {activeAccount.registrationStatus}
-        </Badge>
-      )}
     </div>
   );
 }

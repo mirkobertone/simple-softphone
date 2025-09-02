@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import {
   Select,
   SelectContent,
@@ -12,14 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   Form,
   FormControl,
@@ -68,8 +60,6 @@ export function AccountForm({
     },
   });
 
-  const selectedTransport = form.watch("transport");
-
   // Auto-update port when transport changes
   const handleTransportChange = (transport: string) => {
     const defaultPort = DEFAULT_PORTS[transport as keyof typeof DEFAULT_PORTS];
@@ -83,19 +73,22 @@ export function AccountForm({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>
+    <div className="w-full">
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-2">
           {initialData ? "Edit SIP Account" : "Add SIP Account"}
-        </CardTitle>
-        <CardDescription>
+        </h3>
+        <p className="text-sm text-muted-foreground">
           Configure your SIP account details to connect to your VoIP provider.
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-          <CardContent className="space-y-4">
+        <form
+          onSubmit={form.handleSubmit(handleFormSubmit)}
+          className="space-y-4"
+        >
+          <div className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -234,9 +227,9 @@ export function AccountForm({
                 </FormItem>
               )}
             />
-          </CardContent>
+          </div>
 
-          <CardFooter className="flex justify-between">
+          <div className="flex justify-between pt-4">
             {onCancel && (
               <Button type="button" variant="outline" onClick={onCancel}>
                 Cancel
@@ -249,9 +242,9 @@ export function AccountForm({
                 ? "Update Account"
                 : "Add Account"}
             </Button>
-          </CardFooter>
+          </div>
         </form>
       </Form>
-    </Card>
+    </div>
   );
 }
