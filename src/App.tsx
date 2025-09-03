@@ -22,8 +22,8 @@ function App() {
     isCallActive,
   } = useCall();
 
+  // Load accounts on app start
   useEffect(() => {
-    // Load accounts on app start
     const savedAccounts = storageService.getSIPAccounts();
     const activeAccountId = storageService.getActiveAccountId();
 
@@ -46,8 +46,10 @@ function App() {
       const active = resetAccounts.find((acc) => acc.id === activeAccountId);
       setActiveAccount(active || null);
     }
+  }, [storageService]);
 
-    // Listen for registration status changes
+  // Listen for registration status changes (separate effect to handle dependencies properly)
+  useEffect(() => {
     const handleStatusChange = (accountId: string, status: string) => {
       console.log(
         `[App] Registration status changed for ${accountId}: ${status}`
@@ -64,7 +66,7 @@ function App() {
 
       setAccounts(updatedAccounts);
 
-      // Update active account if it exists
+      // Update active account if it exists - using current activeAccount from closure
       if (activeAccount) {
         console.log(`[App] Current active account:`, activeAccount.id);
         const updatedActive = updatedAccounts.find(
@@ -83,7 +85,7 @@ function App() {
     return () => {
       sipService.off("registrationStatusChanged", handleStatusChange);
     };
-  }, [storageService, sipService]);
+  }, [storageService, sipService, activeAccount]);
 
   // Cleanup on unmount
   useEffect(() => {
