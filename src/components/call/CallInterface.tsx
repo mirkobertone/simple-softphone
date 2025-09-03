@@ -31,6 +31,7 @@ export function CallInterface({
   onHangup,
 }: CallInterfaceProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [lastDialedNumber, setLastDialedNumber] = useState("");
   const isRegistered = activeAccount?.registrationStatus === "registered";
 
   const handleNumberClick = (number: string) => {
@@ -43,6 +44,7 @@ export function CallInterface({
 
   const handleCall = () => {
     if (!phoneNumber.trim()) return;
+    setLastDialedNumber(phoneNumber.trim());
     onCall(phoneNumber.trim());
   };
 
@@ -97,6 +99,7 @@ export function CallInterface({
         isCallActive={isCallActive}
         formatDuration={formatDuration}
         phoneNumber={phoneNumber}
+        lastDialedNumber={lastDialedNumber}
         onPhoneNumberChange={handlePhoneNumberChange}
         disabled={!isRegistered}
       />

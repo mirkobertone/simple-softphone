@@ -16,6 +16,7 @@ interface UnifiedCallDisplayProps {
   isCallActive: boolean;
   formatDuration: (seconds: number) => string;
   phoneNumber: string;
+  lastDialedNumber: string;
   onPhoneNumberChange: (value: string) => void;
   disabled?: boolean;
 }
@@ -26,6 +27,7 @@ export function UnifiedCallDisplay({
   isCallActive,
   formatDuration,
   phoneNumber,
+  lastDialedNumber,
   onPhoneNumberChange,
   disabled = false,
 }: UnifiedCallDisplayProps) {
@@ -49,9 +51,13 @@ export function UnifiedCallDisplay({
   // Get display content based on call state
   const getDisplayContent = () => {
     if (isCallActive) {
+      // Use the remote number from call state, or fall back to the last dialed number
+      const displayNumber =
+        callState.remoteNumber || lastDialedNumber || "Unknown";
+
       return {
         showInput: false,
-        primaryText: callState.remoteNumber || "Unknown",
+        primaryText: displayNumber,
         secondaryText: isInCall
           ? formatDuration(callState.duration)
           : getStatusText(),
