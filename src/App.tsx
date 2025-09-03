@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AccountManager } from "@/components/accounts/AccountManager";
-import { CompactAccountStatus } from "@/components/accounts/CompactAccountStatus";
+import { AccountSelector } from "@/components/accounts/AccountSelector";
 import { CallInterface } from "@/components/call/CallInterface";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -103,9 +103,10 @@ function App() {
               <ModeToggle />
             </div>
 
-            {/* Compact Account Status */}
-            <CompactAccountStatus
+            {/* Account Selector with Connection Controls */}
+            <AccountSelector
               activeAccount={activeAccount}
+              onAccountSelect={handleAccountSelect}
               onManageAccounts={handleManageAccounts}
             />
           </header>
@@ -145,7 +146,7 @@ function App() {
 
               <TabsContent value="accounts" className="space-y-6">
                 <div className="max-w-2xl mx-auto">
-                  <AccountManager onAccountSelect={handleAccountSelect} />
+                  <AccountManager />
                 </div>
               </TabsContent>
             </Tabs>

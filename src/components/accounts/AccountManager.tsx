@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Settings, Trash2, LogIn, LogOut, Loader2 } from "lucide-react";
+import { Plus, Settings, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -15,13 +15,8 @@ import { DEFAULT_PORTS } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
 import { SIPService, type SIPRegistrationStatus } from "@/services/sipService";
 
-interface AccountManagerProps {
-  onAccountSelect?: (account: SIPAccount) => void;
-}
-
-export function AccountManager({ onAccountSelect }: AccountManagerProps) {
+export function AccountManager() {
   const [accounts, setAccounts] = useState<SIPAccount[]>([]);
-  const [activeAccountId, setActiveAccountId] = useState<string | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<SIPAccount | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -32,9 +27,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
 
   const loadAccounts = useCallback(() => {
     const savedAccounts = storageService.getSIPAccounts();
-    const activeId = storageService.getActiveAccountId();
     setAccounts(savedAccounts);
-    setActiveAccountId(activeId);
   }, [storageService]);
 
   // Listen for registration status changes
@@ -71,7 +64,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
   const handleAddAccount = async (formData: SIPAccountFormData) => {
     setIsLoading(true);
     try {
-      const newAccount = storageService.addSIPAccount({
+      storageService.addSIPAccount({
         ...formData,
         isActive: accounts.length === 0, // First account is active by default
         registrationStatus: "unregistered",
@@ -79,9 +72,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
 
       // If this is the first account, make it active
       if (accounts.length === 0) {
-        storageService.setActiveAccountId(newAccount.id);
-        setActiveAccountId(newAccount.id);
-        onAccountSelect?.(newAccount);
+        // Account will be automatically available in the top navigation dropdown
       }
 
       loadAccounts();
@@ -108,10 +99,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
         setEditingAccount(null);
         setIsEditDialogOpen(false); // Close the dialog
 
-        // If this was the active account, notify parent
-        if (updatedAccount.id === activeAccountId) {
-          onAccountSelect?.(updatedAccount);
-        }
+        // Account updates will be reflected in the top navigation
       }
     } catch (error) {
       console.error("Failed to update account:", error);
@@ -126,74 +114,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     if (success) {
       loadAccounts();
 
-      // If the deleted account was active, clear selection
-      if (accountId === activeAccountId) {
-        setActiveAccountId(null);
-        onAccountSelect?.(null as unknown as SIPAccount);
-      }
-    }
-  };
-
-  const handleSetActiveAccount = (account: SIPAccount) => {
-    storageService.setActiveAccountId(account.id);
-    setActiveAccountId(account.id);
-    onAccountSelect?.(account);
-  };
-
-  const handleRegisterAccount = async (account: SIPAccount) => {
-    console.log(
-      `Attempting to register account: ${account.name} (${account.id})`
-    );
-    try {
-      const success = await sipService.registerAccount(account);
-      console.log(`Registration result for ${account.name}: ${success}`);
-    } catch (error) {
-      console.error(`Failed to register account ${account.name}:`, error);
-    }
-  };
-
-  const handleUnregisterAccount = async (account: SIPAccount) => {
-    console.log(
-      `Attempting to unregister account: ${account.name} (${account.id})`
-    );
-
-    const currentAccount = sipService.getCurrentAccount();
-    console.log(
-      "Current SIP account:",
-      currentAccount?.id,
-      currentAccount?.name
-    );
-    console.log("Account to unregister:", account.id, account.name);
-    console.log("Are they the same?", currentAccount?.id === account.id);
-
-    // Check if this account is registered
-    if (account.registrationStatus === "registered") {
-      try {
-        // If SIP service has no current account (e.g., after page reload),
-        // just update the status directly
-        if (!currentAccount) {
-          console.log("No current SIP account, updating status directly");
-          storageService.updateSIPAccount(account.id, {
-            registrationStatus: "unregistered",
-          });
-          loadAccounts();
-        } else {
-          // Normal unregister through SIP service
-          await sipService.unregister();
-        }
-        console.log(`Unregistered account: ${account.name}`);
-      } catch (error) {
-        console.error(`Failed to unregister account ${account.name}:`, error);
-        // Fallback: update status directly if SIP unregister fails
-        storageService.updateSIPAccount(account.id, {
-          registrationStatus: "unregistered",
-        });
-        loadAccounts();
-      }
-    } else {
-      console.warn(
-        `Cannot unregister ${account.name}: account is not registered`
-      );
+      // Account deletion will be reflected in the top navigation
     }
   };
 
@@ -248,12 +169,11 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
           {accounts.map((account) => (
             <Card
               key={account.id}
-              className={`cursor-pointer transition-all duration-200 ${
-                account.id === activeAccountId
-                  ? "ring-2 ring-primary bg-muted/50 shadow-md"
-                  : "hover:bg-muted/30 hover:shadow-sm"
-              }`}
-              onClick={() => handleSetActiveAccount(account)}
+              className="cursor-pointer transition-all duration-200 hover:bg-muted/30 hover:shadow-sm"
+              onClick={() => {
+                setEditingAccount(account);
+                setIsEditDialogOpen(true);
+              }}
             >
               <CardContent className="pt-4">
                 <div className="flex items-start justify-between">
@@ -262,14 +182,6 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                       <h3 className="font-semibold truncate text-foreground">
                         {account.name}
                       </h3>
-                      {account.id === activeAccountId && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs shrink-0 bg-primary/10 text-primary border-primary/20"
-                        >
-                          Active
-                        </Badge>
-                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -309,86 +221,21 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                           )}
                         </div>
                       </div>
-
-                      {account.id === activeAccountId && (
-                        <div className="flex gap-1 mt-2">
-                          {account.registrationStatus === "registered" ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUnregisterAccount(account);
-                              }}
-                              className="text-xs h-7 text-red-600 hover:text-red-700 hover:border-red-200"
-                            >
-                              <LogOut className="w-3 h-3 mr-1" />
-                              Disconnect
-                            </Button>
-                          ) : account.registrationStatus === "connecting" ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled
-                              className="text-xs h-7"
-                            >
-                              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                              Connecting...
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRegisterAccount(account);
-                              }}
-                              className="text-xs h-7 text-green-600 hover:text-green-700 hover:border-green-200"
-                            >
-                              <LogIn className="w-3 h-3 mr-1" />
-                              Connect
-                            </Button>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1 ml-2">
-                    <Dialog
-                      open={isEditDialogOpen}
-                      onOpenChange={setIsEditDialogOpen}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingAccount(account);
+                        setIsEditDialogOpen(true);
+                      }}
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingAccount(account);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          <Settings className="w-4 h-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-md">
-                        <DialogTitle>
-                          {editingAccount ? "Edit SIP Account" : "SIP Account"}
-                        </DialogTitle>
-                        {editingAccount && (
-                          <AccountForm
-                            onSubmit={handleEditAccount}
-                            onCancel={() => {
-                              setEditingAccount(null);
-                              setIsEditDialogOpen(false);
-                            }}
-                            initialData={editingAccount}
-                            isLoading={isLoading}
-                          />
-                        )}
-                      </DialogContent>
-                    </Dialog>
+                      <Settings className="w-4 h-4" />
+                    </Button>
 
                     <Button
                       variant="ghost"
@@ -409,6 +256,24 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
           ))}
         </div>
       )}
+
+      {/* Edit Account Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogTitle>Edit SIP Account</DialogTitle>
+          {editingAccount && (
+            <AccountForm
+              onSubmit={handleEditAccount}
+              onCancel={() => {
+                setEditingAccount(null);
+                setIsEditDialogOpen(false);
+              }}
+              initialData={editingAccount}
+              isLoading={isLoading}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
