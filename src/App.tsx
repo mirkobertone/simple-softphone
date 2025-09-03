@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { AccountManager } from "@/components/accounts/AccountManager";
 import { CompactAccountStatus } from "@/components/accounts/CompactAccountStatus";
 import { CallInterface } from "@/components/call/CallInterface";
+import { ModeToggle } from "@/components/mode-toggle";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Phone, Users } from "lucide-react";
 import type { SIPAccount } from "@/types/sip";
@@ -89,60 +91,68 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 max-w-4xl">
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
-            Simple Softphone
-          </h1>
+    <ThemeProvider defaultTheme="system" storageKey="simple-softphone-theme">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-4 max-w-4xl">
+          {/* Header */}
+          <header className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+                Simple Softphone
+              </h1>
+              <ModeToggle />
+            </div>
 
-          {/* Compact Account Status */}
-          <CompactAccountStatus
-            activeAccount={activeAccount}
-            onManageAccounts={handleManageAccounts}
-          />
-        </header>
+            {/* Compact Account Status */}
+            <CompactAccountStatus
+              activeAccount={activeAccount}
+              onManageAccounts={handleManageAccounts}
+            />
+          </header>
 
-        {/* Main Tabbed Interface */}
-        <main>
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="call" className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Call
-              </TabsTrigger>
-              <TabsTrigger value="accounts" className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Accounts
-              </TabsTrigger>
-            </TabsList>
+          {/* Main Tabbed Interface */}
+          <main>
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger value="call" className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  Call
+                </TabsTrigger>
+                <TabsTrigger
+                  value="accounts"
+                  className="flex items-center gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  Accounts
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="call" className="space-y-6">
-              <CallInterface
-                activeAccount={activeAccount}
-                callState={callState}
-                isInCall={isInCall}
-                isCallActive={isCallActive}
-                formatDuration={formatDuration}
-                onCall={makeCall}
-                onHangup={hangupCall}
-              />
-            </TabsContent>
+              <TabsContent value="call" className="space-y-6">
+                <CallInterface
+                  activeAccount={activeAccount}
+                  callState={callState}
+                  isInCall={isInCall}
+                  isCallActive={isCallActive}
+                  formatDuration={formatDuration}
+                  onCall={makeCall}
+                  onHangup={hangupCall}
+                />
+              </TabsContent>
 
-            <TabsContent value="accounts" className="space-y-6">
-              <div className="max-w-2xl mx-auto">
-                <AccountManager onAccountSelect={handleAccountSelect} />
-              </div>
-            </TabsContent>
-          </Tabs>
-        </main>
+              <TabsContent value="accounts" className="space-y-6">
+                <div className="max-w-2xl mx-auto">
+                  <AccountManager onAccountSelect={handleAccountSelect} />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </main>
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }
 
