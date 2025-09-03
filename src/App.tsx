@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { AccountManager } from "@/components/accounts/AccountManager";
 import { AccountSelector } from "@/components/accounts/AccountSelector";
 import { Dialpad } from "@/components/dialpad/Dialpad";
+import { Phone, PhoneCall, PhoneOff } from "lucide-react";
 import type { SIPAccount } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
 import { SIPService } from "@/services/sipService";
@@ -110,9 +111,11 @@ function App() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 max-w-7xl">
         {/* Header */}
-        <header className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Simple Softphone</h1>
+        <header className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+              Simple Softphone
+            </h1>
 
             {/* Active Account Status Bar */}
             {activeAccount && (
@@ -157,24 +160,26 @@ function App() {
           </div>
         </header>
 
-        <main className="space-y-8">
+        <main className="space-y-12">
           {/* Step 1: Account Management */}
-          <section className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm font-medium flex items-center justify-center">
+          <section className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center shadow-sm">
                 1
               </div>
-              <h2 className="text-lg font-semibold">Configure SIP Account</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200">
+                Configure SIP Account
+              </h2>
             </div>
             <AccountManager onAccountSelect={handleAccountSelect} />
           </section>
 
           {/* Step 2: Make Calls */}
           {activeAccount && (
-            <section className="space-y-4">
-              <div className="flex items-center gap-2">
+            <section className="space-y-6">
+              <div className="flex items-center gap-3">
                 <div
-                  className={`w-6 h-6 rounded-full text-sm font-medium flex items-center justify-center ${
+                  className={`w-8 h-8 rounded-full text-sm font-semibold flex items-center justify-center shadow-sm ${
                     activeAccount.registrationStatus === "registered"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
@@ -182,28 +187,67 @@ function App() {
                 >
                   2
                 </div>
-                <h2 className="text-lg font-semibold">Make Calls</h2>
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200">
+                  Make Calls
+                </h2>
               </div>
 
-              <div className="grid gap-6 lg:grid-cols-2">
+              <div className="flex flex-col items-center space-y-8">
                 {/* Call Status */}
-                <div className="space-y-4">
+                <div className="w-full max-w-md">
                   {isCallActive && (
-                    <div className="bg-muted/30 rounded-lg p-6 text-center border-l-4 border-primary">
-                      <div className="text-lg font-medium mb-2">
-                        {callState.status === "calling" && "📞 Calling..."}
-                        {callState.status === "ringing" && "📳 Ringing..."}
-                        {callState.status === "connected" && "✅ Connected"}
-                        {callState.status === "ended" && "📴 Call Ended"}
+                    <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl p-8 text-center border border-slate-200 dark:border-slate-700 shadow-lg">
+                      <div className="mb-4">
+                        <div
+                          className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${
+                            callState.status === "calling"
+                              ? "bg-blue-100 dark:bg-blue-900/30"
+                              : callState.status === "ringing"
+                              ? "bg-yellow-100 dark:bg-yellow-900/30"
+                              : callState.status === "connected"
+                              ? "bg-green-100 dark:bg-green-900/30"
+                              : "bg-orange-100 dark:bg-orange-900/30"
+                          }`}
+                        >
+                          {callState.status === "calling" && (
+                            <div className="w-8 h-8 rounded-full bg-blue-500 animate-pulse flex items-center justify-center">
+                              <Phone className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                          {callState.status === "ringing" && (
+                            <div className="w-8 h-8 rounded-full bg-yellow-500 animate-bounce flex items-center justify-center">
+                              <PhoneCall className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                          {callState.status === "connected" && (
+                            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                              <PhoneCall className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                          {callState.status === "ended" && (
+                            <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                              <PhoneOff className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                          {callState.status === "calling" && "Calling..."}
+                          {callState.status === "ringing" && "Ringing..."}
+                          {callState.status === "connected" && "Connected"}
+                          {callState.status === "ended" && "Call Ended"}
+                        </div>
                       </div>
+
                       {callState.remoteNumber && (
-                        <div className="text-xl font-mono mb-2">
+                        <div className="text-2xl font-mono font-medium mb-4 text-slate-900 dark:text-slate-100">
                           {callState.remoteNumber}
                         </div>
                       )}
+
                       {isInCall && (
-                        <div className="text-sm text-muted-foreground">
-                          Duration: {formatDuration(callState.duration)}
+                        <div className="text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-2 inline-block">
+                          {formatDuration(callState.duration)}
                         </div>
                       )}
                     </div>
@@ -211,17 +255,29 @@ function App() {
 
                   {!isCallActive &&
                     activeAccount.registrationStatus !== "registered" && (
-                      <div className="bg-muted/30 rounded-lg p-6 text-center">
-                        <div className="text-muted-foreground">
-                          <p className="mb-2 font-medium">
+                      <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-3xl p-8 text-center border border-amber-200 dark:border-amber-800">
+                        <div className="w-16 h-16 mx-auto rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
+                          <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+                            {activeAccount.registrationStatus ===
+                            "connecting" ? (
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <span className="text-white text-sm font-bold">
+                                !
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-amber-800 dark:text-amber-200">
+                          <p className="mb-2 font-semibold">
                             {activeAccount.registrationStatus === "connecting"
-                              ? "🔄 Establishing connection..."
-                              : "⚠️ Connection required"}
+                              ? "Establishing connection..."
+                              : "Connection required"}
                           </p>
-                          <p className="text-sm">
+                          <p className="text-sm opacity-80">
                             {activeAccount.registrationStatus === "failed"
                               ? "Registration failed. Please check your account settings."
-                              : "Click the Register button in your account to connect."}
+                              : "Click the Connect button in your account above."}
                           </p>
                         </div>
                       </div>

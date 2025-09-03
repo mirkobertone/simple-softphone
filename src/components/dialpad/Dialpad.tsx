@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Phone, PhoneCall, Delete } from "lucide-react";
+import { Phone, PhoneOff, Delete } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 interface DialpadProps {
@@ -12,18 +11,18 @@ interface DialpadProps {
 }
 
 const dialpadButtons = [
-  { number: "1", letters: "" },
-  { number: "2", letters: "ABC" },
-  { number: "3", letters: "DEF" },
-  { number: "4", letters: "GHI" },
-  { number: "5", letters: "JKL" },
-  { number: "6", letters: "MNO" },
-  { number: "7", letters: "PQRS" },
-  { number: "8", letters: "TUV" },
-  { number: "9", letters: "WXYZ" },
-  { number: "*", letters: "" },
-  { number: "0", letters: "+" },
-  { number: "#", letters: "" },
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "*",
+  "0",
+  "#",
 ];
 
 export function Dialpad({
@@ -61,80 +60,69 @@ export function Dialpad({
   };
 
   return (
-    <Card className="w-full max-w-sm mx-auto shadow-lg">
-      <CardHeader className="pb-4">
-        <div className="space-y-2">
+    <div className="w-full max-w-xs mx-auto">
+      {/* Phone Number Display */}
+      <div className="mb-6">
+        <div className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm">
           <Input
             value={phoneNumber}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="Enter phone number"
-            className="text-center text-lg font-mono h-12 border-2"
+            className="text-center text-xl font-mono h-14 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-800 dark:text-slate-200 placeholder:text-slate-500"
             disabled={disabled}
           />
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-4">
-        {/* Dialpad Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {dialpadButtons.map(({ number, letters }) => (
-            <Button
-              key={number}
-              variant="outline"
-              size="lg"
-              className="h-16 flex flex-col items-center justify-center hover:bg-muted/50 active:scale-95 transition-all border-2 hover:border-primary/20"
-              onClick={() => handleNumberClick(number)}
-              disabled={disabled}
-            >
-              <span className="text-xl font-semibold">{number}</span>
-              {letters && (
-                <span className="text-xs text-muted-foreground mt-1">
-                  {letters}
-                </span>
-              )}
-            </Button>
-          ))}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3 mt-6">
-          {/* Backspace Button */}
+      {/* Dialpad Grid */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        {dialpadButtons.map((number) => (
           <Button
-            variant="outline"
+            key={number}
+            variant="ghost"
+            className="h-16 w-16 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 text-xl font-semibold text-slate-800 dark:text-slate-200 hover:border-primary/30"
+            onClick={() => handleNumberClick(number)}
+            disabled={disabled}
+          >
+            {number}
+          </Button>
+        ))}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center justify-center gap-4">
+        {/* Backspace Button */}
+        <Button
+          variant="ghost"
+          size="lg"
+          className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 transition-all duration-150"
+          onClick={handleBackspace}
+          disabled={disabled || phoneNumber.length === 0}
+        >
+          <Delete className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+        </Button>
+
+        {/* Call/Hangup Button */}
+        {isInCall ? (
+          <Button
             size="lg"
-            className="flex-1 h-14 border-2"
-            onClick={handleBackspace}
+            className="h-16 w-16 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl active:scale-95 transition-all duration-150 border-0"
+            onClick={handleHangup}
+            disabled={disabled}
+          >
+            <PhoneOff className="w-6 h-6" />
+          </Button>
+        ) : (
+          <Button
+            size="lg"
+            className="h-16 w-16 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl active:scale-95 transition-all duration-150 border-0 disabled:bg-slate-300 disabled:text-slate-500"
+            onClick={handleCall}
             disabled={disabled || phoneNumber.length === 0}
           >
-            <Delete className="w-5 h-5" />
+            <Phone className="w-6 h-6" />
           </Button>
-
-          {/* Call/Hangup Button */}
-          {isInCall ? (
-            <Button
-              variant="destructive"
-              size="lg"
-              className="flex-[2] h-14 text-base font-semibold"
-              onClick={handleHangup}
-              disabled={disabled}
-            >
-              <PhoneCall className="w-5 h-5 mr-2" />
-              Hang Up
-            </Button>
-          ) : (
-            <Button
-              variant="default"
-              size="lg"
-              className="flex-[2] h-14 bg-green-600 hover:bg-green-700 text-base font-semibold"
-              onClick={handleCall}
-              disabled={disabled || phoneNumber.length === 0}
-            >
-              <Phone className="w-5 h-5 mr-2" />
-              Call
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 }
