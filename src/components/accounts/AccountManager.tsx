@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Settings, Trash2, Power, PowerOff } from "lucide-react";
+import { Plus, Settings, Trash2, LogIn, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -210,14 +210,16 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     }
   };
 
-  const getStatusIcon = (status: SIPAccount["registrationStatus"]) => {
+  const getStatusColor = (status: SIPAccount["registrationStatus"]) => {
     switch (status) {
       case "registered":
-        return <Power className="w-3 h-3" />;
+        return "text-green-600";
       case "connecting":
-        return <Power className="w-3 h-3 animate-pulse" />;
+        return "text-yellow-600";
+      case "failed":
+        return "text-red-600";
       default:
-        return <PowerOff className="w-3 h-3" />;
+        return "text-gray-500";
     }
   };
 
@@ -259,49 +261,66 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
           {accounts.map((account) => (
             <Card
               key={account.id}
-              className={`cursor-pointer transition-colors ${
+              className={`cursor-pointer transition-all duration-200 ${
                 account.id === activeAccountId
-                  ? "ring-2 ring-primary bg-muted/50"
-                  : "hover:bg-muted/30"
+                  ? "ring-2 ring-primary bg-muted/50 shadow-md"
+                  : "hover:bg-muted/30 hover:shadow-sm"
               }`}
               onClick={() => handleSetActiveAccount(account)}
             >
               <CardContent className="pt-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-medium truncate">{account.name}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold truncate text-foreground">
+                        {account.name}
+                      </h3>
                       {account.id === activeAccountId && (
-                        <Badge variant="secondary" className="text-xs shrink-0">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs shrink-0 bg-primary/10 text-primary border-primary/20"
+                        >
                           Active
                         </Badge>
                       )}
                     </div>
 
-                    <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground truncate">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground truncate font-mono">
                         {account.userId}@{account.server}
                       </p>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge
-                          variant={getStatusBadgeVariant(
-                            account.registrationStatus
-                          )}
-                          className="text-xs"
-                        >
-                          {getStatusIcon(account.registrationStatus)}
-                          <span className="ml-1 capitalize">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <div
+                            className={`w-2.5 h-2.5 rounded-full ${
+                              account.registrationStatus === "registered"
+                                ? "bg-green-500 shadow-sm"
+                                : account.registrationStatus === "connecting"
+                                ? "bg-yellow-500 animate-pulse shadow-sm"
+                                : account.registrationStatus === "failed"
+                                ? "bg-red-500 shadow-sm"
+                                : "bg-gray-400"
+                            }`}
+                          />
+                          <span
+                            className={`text-xs font-medium capitalize ${getStatusColor(
+                              account.registrationStatus
+                            )}`}
+                          >
                             {account.registrationStatus}
                           </span>
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {account.transport}
-                        </Badge>
-                        {account.port !== DEFAULT_PORTS[account.transport] && (
+                        </div>
+                        <div className="flex items-center gap-1">
                           <Badge variant="outline" className="text-xs">
-                            Port {account.port}
+                            {account.transport}
                           </Badge>
-                        )}
+                          {account.port !==
+                            DEFAULT_PORTS[account.transport] && (
+                            <Badge variant="outline" className="text-xs">
+                              :{account.port}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
 
                       {account.id === activeAccountId && (
@@ -314,10 +333,10 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                                 e.stopPropagation();
                                 handleUnregisterAccount(account);
                               }}
-                              className="text-xs h-7"
+                              className="text-xs h-7 text-red-600 hover:text-red-700 hover:border-red-200"
                             >
-                              <PowerOff className="w-3 h-3 mr-1" />
-                              Unregister
+                              <LogOut className="w-3 h-3 mr-1" />
+                              Disconnect
                             </Button>
                           ) : account.registrationStatus === "connecting" ? (
                             <Button
@@ -326,7 +345,7 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                               disabled
                               className="text-xs h-7"
                             >
-                              <Power className="w-3 h-3 mr-1 animate-pulse" />
+                              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                               Connecting...
                             </Button>
                           ) : (
@@ -337,10 +356,10 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
                                 e.stopPropagation();
                                 handleRegisterAccount(account);
                               }}
-                              className="text-xs h-7"
+                              className="text-xs h-7 text-green-600 hover:text-green-700 hover:border-green-200"
                             >
-                              <Power className="w-3 h-3 mr-1" />
-                              Register
+                              <LogIn className="w-3 h-3 mr-1" />
+                              Connect
                             </Button>
                           )}
                         </div>
