@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, LogIn, LogOut, Loader2, User } from "lucide-react";
+import { LogIn, LogOut, Loader2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,12 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import type { SIPAccount } from "@/types/sip";
 import { StorageService } from "@/services/storageService";
 import { SIPService } from "@/services/sipService";
@@ -22,13 +17,11 @@ import { SIPService } from "@/services/sipService";
 interface AccountSelectorProps {
   activeAccount: SIPAccount | null;
   onAccountSelect: (account: SIPAccount) => void;
-  onManageAccounts: () => void;
 }
 
 export function AccountSelector({
   activeAccount,
   onAccountSelect,
-  onManageAccounts,
 }: AccountSelectorProps) {
   const [accounts, setAccounts] = useState<SIPAccount[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -46,7 +39,7 @@ export function AccountSelector({
     loadAccounts();
 
     // Listen for registration status changes to update connection state
-    const handleStatusChange = (accountId: string, status: string) => {
+    const handleStatusChange = (_accountId: string, status: string) => {
       setIsConnecting(status === "connecting");
       // Reload accounts to get updated status
       loadAccounts();
@@ -129,10 +122,9 @@ export function AccountSelector({
           <User className="w-4 h-4" />
           No accounts configured
         </div>
-        <Button variant="outline" size="sm" onClick={onManageAccounts}>
-          <Settings className="w-4 h-4 mr-2" />
-          Add Account
-        </Button>
+        <span className="text-xs text-muted-foreground">
+          Use the Accounts tab to add accounts
+        </span>
       </div>
     );
   }
@@ -240,21 +232,6 @@ export function AccountSelector({
           </div>
         )}
       </div>
-
-      {/* Settings Menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="shrink-0">
-            <Settings className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={onManageAccounts}>
-            <Settings className="w-4 h-4 mr-2" />
-            Manage Accounts
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 }

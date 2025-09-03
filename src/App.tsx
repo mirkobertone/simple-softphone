@@ -86,10 +86,6 @@ function App() {
     // Don't automatically switch tabs - let user stay in accounts view
   };
 
-  const handleManageAccounts = () => {
-    setActiveTab("accounts");
-  };
-
   return (
     <ThemeProvider defaultTheme="system" storageKey="simple-softphone-theme">
       <div className="min-h-screen bg-background">
@@ -107,7 +103,6 @@ function App() {
             <AccountSelector
               activeAccount={activeAccount}
               onAccountSelect={handleAccountSelect}
-              onManageAccounts={handleManageAccounts}
             />
           </header>
 
