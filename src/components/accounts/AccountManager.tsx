@@ -197,19 +197,6 @@ export function AccountManager({ onAccountSelect }: AccountManagerProps) {
     }
   };
 
-  const getStatusBadgeVariant = (status: SIPAccount["registrationStatus"]) => {
-    switch (status) {
-      case "registered":
-        return "default";
-      case "connecting":
-        return "secondary";
-      case "failed":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
   const getStatusColor = (status: SIPAccount["registrationStatus"]) => {
     switch (status) {
       case "registered":

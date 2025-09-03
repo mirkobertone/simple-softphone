@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UnifiedCallDisplay } from "./UnifiedCallDisplay";
+import { SmoothUnifiedDisplay } from "./SmoothUnifiedDisplay";
 import { SimpleDialpad } from "@/components/dialpad/SimpleDialpad";
 import type { SIPAccount } from "@/types/sip";
 
@@ -92,8 +92,8 @@ export function CallInterface({
 
   return (
     <div className="flex flex-col items-center space-y-8 max-w-md mx-auto">
-      {/* Unified Call Display - transforms between input and call status */}
-      <UnifiedCallDisplay
+      {/* Smooth Unified Display - transforms between input and call status */}
+      <SmoothUnifiedDisplay
         callState={callState}
         isInCall={isInCall}
         isCallActive={isCallActive}
