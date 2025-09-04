@@ -1,69 +1,158 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<img src="public/logo.svg" alt="WebRTC Phone Logo" width="80" height="80">
 
-Currently, two official plugins are available:
+# 📞 WebRTC Phone
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+_A modern WebRTC-based SIP phone for VoIP communications_
 
-## Expanding the ESLint configuration
+[![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1.12-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
+[![shadcn/ui](https://img.shields.io/badge/shadcn/ui-Latest-000000?style=flat-square)](https://ui.shadcn.com/)
+[![JsSIP](https://img.shields.io/badge/JsSIP-3.10.1-FF6B6B?style=flat-square)](https://jssip.net/)
+[![WebRTC](https://img.shields.io/badge/WebRTC-Enabled-4CAF50?style=flat-square&logo=webrtc)](https://webrtc.org/)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+A clean, minimal, and beautiful WebRTC-based SIP phone built with modern web technologies. Make calls from your browser with WebSocket connectivity and an intuitive interface that just works.
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+[🚀 Get Started](#-getting-started) • [✨ Features](#-features) • [🛠️ Tech Stack](#%EF%B8%8F-tech-stack) • [📱 Screenshots](#-screenshots)
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+</div>
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## ✨ Features
+
+- **🎯 Minimal Design** — Clean, distraction-free interface focused on making calls
+- **🔄 Smooth Animations** — Fluid transitions between input and call states
+- **📱 Responsive Layout** — Works beautifully on desktop and mobile devices
+- **🎨 Modern UI** — Built with Radix UI components and Tailwind CSS
+- **⚡ WebRTC-Powered** — Real-time SIP calling with WebSocket connectivity
+- **🔧 Account Management** — Easy SIP account configuration and switching
+- **🌙 Dark Mode Ready** — Automatic theme support
+- **🎨 shadcn/ui Components** — Beautiful, accessible UI components
+- **📞 Call Controls** — Intuitive dialpad with call/hangup functionality
+- **🔌 WebSocket Support** — WS and WSS transport protocols only
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A SIP provider account (VoIP service)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/mirkobertone/webrtc-phone.git
+
+# Navigate to the project directory
+cd webrtc-phone
+
+# Install dependencies
+pnpm install
+
+# Start the development server
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Configuration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Open the application in your browser
+2. Navigate to the **Accounts** tab
+3. Add your SIP account details:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   - **Name**: A friendly name for your account
+   - **User ID**: Your SIP username
+   - **Password**: Your SIP password
+   - **Server**: Your SIP server address
+   - **Port**: SIP server port (default: 8088 for WS, 8089 for WSS)
+   - **Transport**: WebSocket protocol (WS or WSS only)
+   - **WebSocket Path**: Path on the server (e.g., /ws)
+
+4. Click **Connect** to register your account
+5. Switch to the **Call** tab and start making calls!
+
+## 🛠️ Tech Stack
+
+- **Frontend**: React 19 + TypeScript
+- **Styling**: Tailwind CSS 4 + shadcn/ui
+- **Components**: Radix UI primitives via shadcn/ui
+- **SIP**: JsSIP WebRTC Library
+- **Transport**: WebSocket (WS/WSS) only
+- **Build Tool**: Vite
+- **Icons**: Lucide React
+- **Forms**: React Hook Form + Zod
+
+## 📱 Screenshots
+
+<div align="center">
+
+### Call Interface
+
+![Call Interface](screenshots/call-interface.png)
+
+_Clean dialpad with smooth animations and modern UI_
+
+### Account Management
+
+![Account Management](screenshots/account-management.png)
+
+_Simple SIP account configuration with WebSocket settings and URI preview_
+
+### Active Call
+
+![Active Call](screenshots/active-call.png)
+
+_Minimal call status display with call controls_
+
+### Dark Mode
+
+![Dark Mode](screenshots/dark-mode.png)
+
+_Beautiful and minimal dark theme_
+
+</div>
+
+## 🎨 Design Philosophy
+
+WebRTC Phone follows a **"less is more"** approach:
+
+- **Single Purpose** — Focused solely on making and receiving calls
+- **Unified Interface** — One element that transforms between input and call status
+- **Smooth Transitions** — Every interaction feels natural and responsive
+- **Clean Aesthetics** — Minimal visual noise, maximum usability
+- **Modern Web Standards** — Built for the web with WebRTC and WebSocket technologies
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful component system built on Radix UI
+- [JsSIP](https://jssip.net/) - WebRTC SIP library
+- [Radix UI](https://www.radix-ui.com/) - Accessible component primitives
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Lucide](https://lucide.dev/) - Beautiful icon library
+
+---
+
+<div align="center">
+
+**A modern WebRTC phone** 📞
+
+Made with ❤️ for simple, web-based communication
+
+</div>
