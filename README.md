@@ -74,6 +74,91 @@ pnpm dev
 4. Click **Connect** to register your account
 5. Switch to the **Call** tab and start making calls!
 
+## 🤖 AI Voice Agent Integration with AVR
+
+WebRTC Phone integrates seamlessly with [Agent Voice Response (AVR)](https://www.agentvoiceresponse.com/) - the ultimate conversational AI platform for Asterisk PBX systems. Experience ultra-low latency speech-to-speech, advanced Voice Activity Detection, and intelligent noise suppression.
+
+### AVR Features
+
+- **Real-Time Speech-to-Speech** - Ultra-low latency voice conversations with OpenAI Realtime, Ultravox, and Deepgram
+- **Intelligent Voice Activity Detection** - Natural interruption handling for truly interactive conversations
+- **Background Noise Suppression** - AI-powered noise cancellation and echo suppression
+- **Seamless Asterisk Integration** - Native integration with Asterisk PBX, FreePBX, VitalPBX, and Vicidial
+
+### Asterisk Configuration for WebRTC
+
+Add this configuration to your `pjsip.conf` file to enable WebSocket transport for WebRTC Phone:
+
+```ini
+[transport-ws]
+type=transport
+protocol=ws
+bind=0.0.0.0
+external_media_address=127.0.0.1
+# external_signaling_address=127.0.0.1
+# external_signaling_port=8088
+local_net=127.0.0.1/32
+
+[endpoint-template-ws](!)
+type=endpoint
+transport=transport-ws
+context=demo
+disallow=all
+# WebRTC compatible codecs - order matters!
+;allow=opus
+allow=gsm
+allow=ulaw
+;allow=alaw
+;allow=g722
+# WebRTC specific settings
+direct_media=no
+force_rport=no
+rewrite_contact=yes
+rtp_symmetric=yes
+ice_support=yes
+use_avpf=yes
+media_encryption=dtls
+dtls_verify=no
+dtls_setup=actpass
+dtls_auto_generate_cert=yes
+webrtc=yes
+# Additional WebRTC settings
+rtcp_mux=yes
+
+[1001](endpoint-template-ws)
+auth=1001
+aors=1001
+
+[1001]
+type=auth
+auth_type=userpass
+password=1001
+username=1001
+
+[1001]
+type=aor
+max_contacts=10
+```
+
+### WebRTC Phone Configuration for AVR
+
+Configure your WebRTC Phone to connect to your Asterisk server:
+
+1. **Server**: `127.0.0.1`
+2. **User ID**: `1001`
+3. **Password**: `1001`
+4. **Port**: `8088` (for WS) or `8089` (for WSS)
+5. **Transport**: `WS` or `WSS`
+6. **WebSocket Path**: `/ws`
+
+### Testing the Integration
+
+1. **Add the account** in WebRTC Phone with the configuration above
+2. **Connect** to register with Asterisk
+3. **Call extension 600** to test the echo extension
+
+For more information about AVR, visit [agentvoiceresponse.com](https://www.agentvoiceresponse.com/).
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19 + TypeScript
