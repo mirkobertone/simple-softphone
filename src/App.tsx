@@ -93,9 +93,16 @@ function App() {
           {/* Header */}
           <header className="mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
-                Simple Softphone
-              </h1>
+              <div className="flex items-center gap-4">
+                <img
+                  src="/logo.svg"
+                  alt="Simple Softphone Logo"
+                  className="w-12 h-12"
+                />
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
+                  Simple Softphone
+                </h1>
+              </div>
               <ModeToggle />
             </div>
 
