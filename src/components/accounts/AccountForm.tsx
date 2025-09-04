@@ -30,7 +30,7 @@ const sipAccountSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
   password: z.string().min(1, "Password is required"),
   port: z.number().min(1).max(65535, "Port must be between 1 and 65535"),
-  transport: z.enum(["UDP", "TCP", "TLS", "WS", "WSS"]),
+  transport: z.enum(["WS", "WSS"]),
   websocketPath: z.string().optional(),
   displayName: z.string().optional(),
 });
@@ -73,6 +73,27 @@ export function AccountForm({
   const handleFormSubmit = (data: SIPAccountFormData) => {
     onSubmit(data);
   };
+
+  // Generate URI preview
+  const generateUriPreview = () => {
+    const formData = form.getValues();
+    if (!formData.server || !formData.port || !formData.transport) {
+      return "";
+    }
+
+    const protocol = formData.transport.toLowerCase();
+    const path = formData.websocketPath || "/ws";
+    return `${protocol}://${formData.server}:${formData.port}${path}`;
+  };
+
+  // Watch form changes to update preview
+  const watchedFields = form.watch([
+    "server",
+    "port",
+    "transport",
+    "websocketPath",
+  ]);
+  const uriPreview = generateUriPreview();
 
   return (
     <div className="w-full">
@@ -226,6 +247,24 @@ export function AccountForm({
                 </FormItem>
               )}
             />
+
+            {/* URI Preview */}
+            {uriPreview && (
+              <div className="rounded-lg border bg-muted/50 p-4">
+                <div className="mb-2">
+                  <FormLabel className="text-sm font-medium">
+                    Connection URI Preview
+                  </FormLabel>
+                </div>
+                <div className="font-mono text-sm text-foreground bg-background rounded px-3 py-2 border">
+                  {uriPreview}
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  This is the WebSocket URI that will be used to connect to your
+                  SIP server
+                </p>
+              </div>
+            )}
 
             <FormField
               control={form.control}
