@@ -1,45 +1,34 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background circle with gradient -->
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="phoneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#F1F5F9;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#10B981;stop-opacity:0.8" />
-      <stop offset="50%" style="stop-color:#06D6A0;stop-opacity:0.6" />
-      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:0.4" />
+    <linearGradient id="minimal-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
     </linearGradient>
   </defs>
   
-  <!-- Main background circle -->
-  <circle cx="32" cy="32" r="30" fill="url(#bgGradient)" stroke="#1E40AF" stroke-width="2"/>
+  <!-- Clean circular background -->
+  <circle cx="32" cy="32" r="28" fill="url(#minimal-gradient)" opacity="0.1"/>
   
-  <!-- Phone handset -->
-  <path d="M20 22C20 20.8954 20.8954 20 22 20H26C27.1046 20 28 20.8954 28 22V26C28 27.1046 27.1046 28 26 28H22C20.8954 28 20 27.1046 20 26V22Z" fill="url(#phoneGradient)" stroke="#1E40AF" stroke-width="1"/>
+  <!-- Minimalist phone icon -->
+  <path d="M24 20 C22 20 20 22 20 24 L20 28 C20 30 22 32 24 32 L28 32 C30 32 32 30 32 28 L32 24 C32 22 30 20 28 20 Z" 
+        fill="none" 
+        stroke="url(#minimal-gradient)" 
+        stroke-width="2.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
   
-  <path d="M36 36C36 34.8954 36.8954 34 38 34H42C43.1046 34 44 34.8954 44 36V40C44 41.1046 43.1046 42 42 42H38C36.8954 42 36 41.1046 36 40V36Z" fill="url(#phoneGradient)" stroke="#1E40AF" stroke-width="1"/>
+  <path d="M36 32 C34 32 32 34 32 36 L32 40 C32 42 34 44 36 44 L40 44 C42 44 44 42 44 40 L44 36 C44 34 42 32 40 32 Z" 
+        fill="none" 
+        stroke="url(#minimal-gradient)" 
+        stroke-width="2.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
   
-  <!-- Connecting curve -->
-  <path d="M26 24C28 24 30 26 32 28C34 30 36 32 38 36" stroke="url(#phoneGradient)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Elegant connecting line -->
+  <path d="M28 26 Q32 30 36 34" 
+        stroke="url(#minimal-gradient)" 
+        stroke-width="2" 
+        fill="none" 
+        stroke-linecap="round"/>
   
-  <!-- Signal waves -->
-  <path d="M46 18C50 22 50 26 46 30" stroke="url(#waveGradient)" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M48 20C51 23 51 25 48 28" stroke="url(#waveGradient)" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M50 22C52 24 52 24 50 26" stroke="url(#waveGradient)" stroke-width="2" fill="none" stroke-linecap="round"/>
-  
-  <!-- WebSocket indicator dots -->
-  <circle cx="15" cy="32" r="2" fill="#10B981" opacity="0.8">
-    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="12" cy="28" r="1.5" fill="#06D6A0" opacity="0.6">
-    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" begin="0.3s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="12" cy="36" r="1.5" fill="#3B82F6" opacity="0.4">
-    <animate attributeName="opacity" values="0.1;0.6;0.1" dur="2s" begin="0.6s" repeatCount="indefinite"/>
-  </circle>
 </svg>
